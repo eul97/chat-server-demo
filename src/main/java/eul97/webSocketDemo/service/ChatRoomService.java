@@ -1,14 +1,11 @@
 package eul97.webSocketDemo.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eul97.webSocketDemo.entity.ChatMessage;
+import eul97.webSocketDemo.dto.ChatRoomResponseDto;
 import eul97.webSocketDemo.entity.ChatRoom;
-import eul97.webSocketDemo.entity.MessageType;
+import eul97.webSocketDemo.repository.ChatMessageRepository;
 import eul97.webSocketDemo.repository.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.ArrayList;
@@ -22,45 +19,29 @@ public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final Map<Long, List<WebSocketSession>> sessionTable = new HashMap<>();
+    private final ChatMessageRepository chatMessageRepository;
 
-    public ChatRoom createChatRoom(String name) {
+    public ChatRoomResponseDto createChatRoom(String name) {
         ChatRoom chatRoom = ChatRoom.builder()
                 .name(name)
                 .build();
 
         chatRoomRepository.save(chatRoom);
-        return chatRoom;
+        return ChatRoomResponseDto.create(chatRoom);
     }
 
-    public List<ChatRoom> getAllChatRoom() {
-        return chatRoomRepository.findAll();
-    }
+    public List<ChatRoomResponseDto> getAllChatRoom() {
+        List<ChatRoomResponseDto> responseDto = new ArrayList<>();
+        List<ChatRoom> chatRooms = chatRoomRepository.findAll();
 
-    public ChatRoom getChatRoom(Long id) throws Exception {
-        return chatRoomRepository.findById(id).orElseThrow(Exception::new);
-    }
-
-    public void handleMessage(WebSocketSession session, ChatMessage message, ObjectMapper objectMapper) throws Exception {
-        ChatRoom chatRoom = chatRoomRepository.findById(message.getChatRoomId()).orElseThrow(Exception::new);
-        switch (message.getType()) {
-            case ENTER:
-                message.setMessage(message.getWriter() + "님이 입장하셨습니다");
-                if (!sessionTable.containsKey(chatRoom.getRoomId()))
-                    sessionTable.put(chatRoom.getRoomId(), new ArrayList<>());
-                sessionTable.get(chatRoom.getRoomId()).add(session);
-                break;
-            case LEAVE:
-                message.setMessage(message.getWriter() + "님이 퇴장하셨습니다");
-                sessionTable.get(chatRoom.getRoomId()).remove(session);
-                break;
-            case CHAT:
-                message.setMessage(message.getWriter() + ": " + message.getMessage());
+        for (ChatRoom room : chatRooms) {
+            responseDto.add(ChatRoomResponseDto.create(room));
         }
-        TextMessage textMessage = new TextMessage(objectMapper.writeValueAsString(message.getMessage()));
 
+        return responseDto;
+    }
 
-        for (WebSocketSession chatRoomSession : sessionTable.get(chatRoom.getRoomId())) {
-            chatRoomSession.sendMessage(textMessage);
-        }
+    public ChatRoomResponseDto getChatRoom(Long id) throws Exception {
+        return ChatRoomResponseDto.create(chatRoomRepository.findById(id).orElseThrow(Exception::new));
     }
 }

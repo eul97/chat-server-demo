@@ -7,7 +7,9 @@ import lombok.Setter;
 import org.springframework.web.socket.WebSocketSession;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -17,17 +19,21 @@ import java.util.Set;
 public class ChatRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long roomId;
+    @Column(name = "chatroom_id")
+    private Long id;
 
     private String name;
+
+    @OneToMany(mappedBy = "chatRoom", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatMessage> chatMessageList = new ArrayList<>();
 
     // DB테이블에는 존재 x, 엔티티 클래스에는 포함
     @Transient
     private Set<WebSocketSession> sessions = new HashSet<>();
 
     @Builder
-    public ChatRoom(Long roomId, String name) {
-        this.roomId = roomId;
+    public ChatRoom(Long id, String name) {
+        this.id = id;
         this.name = name;
     }
 
