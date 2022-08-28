@@ -16,7 +16,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // Client 에서 webSocket 연결할 때 사용할 API 경로를 설정
-        registry.addEndpoint("/ws/chat")
+        registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
@@ -25,9 +25,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry registry) {
 
         // 메시지를 보낼 경로 설정
-        registry.enableSimpleBroker("/pub");
+        registry.enableSimpleBroker("/sub");
 
         // 메시지를 받을 경로 설정
-        registry.setApplicationDestinationPrefixes("/sub");
+        registry.setApplicationDestinationPrefixes("/pub");
     }
 }

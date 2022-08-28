@@ -1,27 +1,24 @@
 package eul97.webSocketDemo.dto;
 
 import eul97.webSocketDemo.entity.ChatRoom;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class ChatRoomResponseDto {
-    private Long id;
-    private String name;
+    private List<ChatRoomDto> chatRooms = new ArrayList<>();
 
-    @Builder
-    public ChatRoomResponseDto(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public static ChatRoomResponseDto convert(ChatRoom chatRoom) {
-
-        return ChatRoomResponseDto.builder()
-                .id(chatRoom.getId())
+    public void convert(ChatRoom chatRoom) {
+        chatRooms.add(ChatRoomDto.builder()
                 .name(chatRoom.getName())
-                .build();
+                .id(chatRoom.getId())
+                .build());
     }
 }
+

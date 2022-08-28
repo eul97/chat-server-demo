@@ -1,6 +1,7 @@
 package eul97.webSocketDemo.service;
 
 import eul97.webSocketDemo.dto.ChatMessageResponseDto;
+import eul97.webSocketDemo.dto.ChatRoomDto;
 import eul97.webSocketDemo.dto.ChatRoomResponseDto;
 import eul97.webSocketDemo.entity.ChatMessage;
 import eul97.webSocketDemo.entity.ChatRoom;
@@ -20,28 +21,29 @@ public class ChatRoomService {
     private final Map<Long, List<WebSocketSession>> sessionTable = new HashMap<>();
     private final ChatMessageRepository chatMessageRepository;
 
-    public ChatRoomResponseDto createChatRoom(String name) {
+    public void createChatRoom(String name) {
         ChatRoom chatRoom = ChatRoom.builder()
                 .name(name)
                 .build();
 
         chatRoomRepository.save(chatRoom);
-        return ChatRoomResponseDto.convert(chatRoom);
     }
 
-    public List<ChatRoomResponseDto> getAllChatRoom() {
-        List<ChatRoomResponseDto> responseDto = new ArrayList<>();
+    public ChatRoomResponseDto getAllChatRoom() {
+        ChatRoomResponseDto responseDto = new ChatRoomResponseDto();
         List<ChatRoom> chatRooms = chatRoomRepository.findAll();
 
-        for (ChatRoom room : chatRooms) {
-            responseDto.add(ChatRoomResponseDto.convert(room));
-        }
+        chatRooms.forEach(responseDto::convert);
 
         return responseDto;
     }
 
-    public ChatRoomResponseDto getChatRoom(Long id) throws Exception {
-        return ChatRoomResponseDto.convert(chatRoomRepository.findById(id).orElseThrow(Exception::new));
+    public ChatRoomDto getChatRoom(Long id) throws Exception {
+        ChatRoom chatRoom = chatRoomRepository.findById(id).orElseThrow(Exception::new);
+        return ChatRoomDto.builder()
+                .name(chatRoom.getName())
+                .id(chatRoom.getId())
+                .build();
     }
 
 
