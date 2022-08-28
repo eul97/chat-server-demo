@@ -44,7 +44,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
         String msg = (String) message.getPayload();
         ChatMessage chatMessage = objectMapper.readValue(msg, ChatMessage.class);
-        chatRoomService.handleMessage(session, chatMessage, objectMapper);
 
     }
 

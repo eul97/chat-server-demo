@@ -23,12 +23,12 @@ public class ChatMessage {
 
     private String message;
 
-    private MessageType type;
+    private String writer;
 
     @Builder
-    public ChatMessage(ChatRoom chatRoom, String message, MessageType type) {
+    public ChatMessage(ChatRoom chatRoom, String message, String writer) {
         this.chatRoom = chatRoom;
         this.message = message;
-        this.type = type;
+        this.writer = writer;
     }
 }
